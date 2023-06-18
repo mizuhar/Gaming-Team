@@ -1,7 +1,7 @@
 const routes = require("express").Router();
 const userManager = require('../managers/userManagers');
 const {TOKEN_KEY} = require('../config/config');
-const {getErrorMessages} = require('../utils/errorHelpers');
+const {getErrorMessages, extractsErrorMessages} = require('../utils/errorHelpers');
 
 
 
@@ -15,7 +15,7 @@ routes.post("/register",async (req, res) => {
      res.cookie(TOKEN_KEY,token);
       res.redirect("/");
     } catch (err) {
-      res.render('users/register',{error: getErrorMessages(err),username,email});
+      res.render('users/register',{error: extractsErrorMessages(err),username,email});
     }
   })
 
@@ -28,8 +28,13 @@ routes.post("/register",async (req, res) => {
     const token = await userManager.login( email, password );
     res.cookie(TOKEN_KEY,token)
     res.redirect("/");
-    } catch (err) {res.render('users/login',{error: getErrorMessages(err)});}
+    } catch (err) {res.render('users/login',{error: extractsErrorMessages(err)});}
   });
+  
+  routes.get('/logout',(req, res) => {
+    res.clearCookie(TOKEN_KEY);
+    res.redirect("/");
+  })
 
 
 
